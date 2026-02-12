@@ -33,7 +33,6 @@ ENV/
 *.swo
 
 # Project Specific
-results/
 logs/
 .pytest_cache/
 .ruff_cache/

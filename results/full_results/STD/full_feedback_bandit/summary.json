@@ -1,0 +1,8 @@
+{
+  "agent_name": "standard_full_feedback_bandit",
+  "total_episodes": 5000,
+  "mean_reward": 0.3941323117559086,
+  "final_reward_mean": 0.4378316974946946,
+  "regret_sensitivity": 0.5,
+  "mean_alpha": 0.0
+}

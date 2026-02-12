@@ -1,0 +1,8 @@
+{
+  "agent_name": "counterfactual_counterfactual_bandit",
+  "total_episodes": 2000,
+  "mean_reward": 0.015375369116570255,
+  "final_reward_mean": -0.36632342703105697,
+  "regret_sensitivity": 0.5395,
+  "mean_alpha": 0.5
+}

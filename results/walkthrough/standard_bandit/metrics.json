@@ -1,0 +1,8 @@
+{
+  "agent_name": "standard_standard_bandit",
+  "total_episodes": 2000,
+  "mean_reward": 0.016128478292174404,
+  "final_reward_mean": -0.2528183540435198,
+  "regret_sensitivity": 0.5,
+  "mean_alpha": 0.0
+}

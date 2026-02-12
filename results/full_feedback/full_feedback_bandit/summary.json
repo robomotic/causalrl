@@ -1,0 +1,8 @@
+{
+  "agent_name": "counterfactual_full_feedback_bandit",
+  "total_episodes": 2000,
+  "mean_reward": 0.2362264722943104,
+  "final_reward_mean": 0.2768170467259567,
+  "regret_sensitivity": 0.968,
+  "mean_alpha": 0.9898333333726707
+}
