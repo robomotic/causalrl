@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "causalrl"
+version = "0.1.0"
+description = "Counterfactual Reinforcement Learning for the OAK Architecture"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Paolo Di Prodi"},
+]
+keywords = ["reinforcement-learning", "counterfactual", "causal-inference", "OAK"]
+
+dependencies = [
+    "numpy>=1.24",
+    "gymnasium>=0.29",
+    "torch>=2.0",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+]
+wandb = [
+    "wandb>=0.15",
+]
+
+[project.scripts]
+crl-train = "causalrl.cli:train_main"
+crl-evaluate = "causalrl.cli:evaluate_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]

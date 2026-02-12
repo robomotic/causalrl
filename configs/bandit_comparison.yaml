@@ -1,0 +1,36 @@
+# Bandit comparison: Standard RL vs. Counterfactual RL
+# This config runs both agents on a 10-arm bandit to compare sample efficiency.
+
+name: "bandit_comparison"
+seed: 42
+num_episodes: 2000
+eval_interval: 100
+log_dir: "results"
+
+env:
+  type: "bandit"
+  num_arms: 10
+  feedback_mode: "partial"
+  reward_drift_rate: 0.0
+  # Grid-world params (unused here)
+  grid_size: 5
+  num_goals: 3
+  stochasticity: 0.0
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.99
+  world_model:
+    type: "tabular"
+    learning_rate: 0.0
+    hidden_size: 128
+    num_layers: 2
+  ofc:
+    mode: "adaptive"
+    alpha: 0.5
+    alpha_min: 0.0
+    alpha_max: 1.0
+    uncertainty_sensitivity: 1.0

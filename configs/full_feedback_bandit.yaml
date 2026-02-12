@@ -1,0 +1,29 @@
+# Full feedback bandit experiment
+# The agent observes rewards for ALL arms, which is the "purest" case
+# for showing the benefit of the counterfactual update mechanism.
+
+name: "full_feedback_bandit"
+seed: 42
+num_episodes: 2000
+log_dir: "results"
+
+env:
+  type: "bandit"
+  num_arms: 10
+  feedback_mode: "full"
+  reward_drift_rate: 0.0
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.99
+  world_model:
+    type: "tabular"
+  ofc:
+    mode: "fixed"
+    alpha: 0.5
+    alpha_min: 0.0
+    alpha_max: 1.0
+    uncertainty_sensitivity: 0.5
