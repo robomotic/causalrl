@@ -41,6 +41,8 @@ def create_env(config: ExperimentConfig):
             num_arms=config.env.num_arms,
             feedback_mode=config.env.feedback_mode,
             reward_drift_rate=config.env.reward_drift_rate,
+            reward_std=config.env.reward_std,
+            reward_shift_interval=config.env.reward_shift_interval,
             seed=config.seed,
         )
     elif config.env.type == "grid_world":
@@ -76,7 +78,11 @@ def create_agent(config: ExperimentConfig, env):
         # Create world model
         wm_type = config.agent.world_model.type
         if wm_type == "tabular":
-            wm = TabularWorldModel(num_states, num_actions)
+            wm = TabularWorldModel(
+                num_states, 
+                num_actions, 
+                learning_rate=config.agent.world_model.learning_rate
+            )
         elif wm_type == "oracle":
             wm = OracleWorldModel(env, num_states, num_actions)
         else:

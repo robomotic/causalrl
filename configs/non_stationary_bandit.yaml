@@ -1,0 +1,27 @@
+# Non-stationary bandit experiment
+# Rewards drift over time, testing the agent's ability to track the moving optimal arm.
+
+name: "non_stationary_bandit"
+seed: 42
+num_episodes: 5000
+log_dir: "results"
+
+env:
+  type: "bandit"
+  num_arms: 10
+  feedback_mode: "full"
+  reward_drift_rate: 0.05  # Significant drift per step
+  reward_std: 0.5         # Lower noise to make drift more visible
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.0           # Bandit is a 1-step task, discount doesn't matter much but let's keep it low
+  world_model:
+    type: "tabular"
+    learning_rate: 0.1
+  ofc:
+    mode: "fixed"
+    alpha: 0.5

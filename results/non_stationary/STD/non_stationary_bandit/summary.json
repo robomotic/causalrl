@@ -1,0 +1,8 @@
+{
+  "agent_name": "standard_non_stationary_bandit",
+  "total_episodes": 5000,
+  "mean_reward": 2.4787715963262116,
+  "final_reward_mean": 1.9844404578083126,
+  "regret_sensitivity": 0.5,
+  "mean_alpha": 0.0
+}

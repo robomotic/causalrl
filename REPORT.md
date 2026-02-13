@@ -80,7 +80,28 @@ Measured mean reward over 2,000 episodes on a 10-armed bandit.
 
 ---
 
-## 5. Engineering & Reliability
+## 5. Non-Stationary Environments: Tracking Drifting Rewards
+
+We tested the agents on a **Non-Stationary Bandit** where the mean reward of each arm drifted according to a Gaussian random walk ($\sigma_{drift} = 0.05$). This task tests the agent's ability to "track" moving targets.
+
+### 5.1 Drift Tracking Results
+Measured mean reward over 5,000 episodes using **Full Feedback**.
+
+| Metric | Standard RL Agent | **Counterfactual Agent** | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Mean Reward** | 2.479 | **2.555** | **+3.1%** |
+| Learning Mechanism | Direct Observation | Composite + Global Tracking |
+
+### 5.2 The Hindsight Advantage
+Standard RL agents only update their knowledge of an arm's value when they select it. In a drifting environment, their knowledge of unchosen arms becomes "stale." 
+
+In contrast, the **Counterfactual Agent** uses its world model to track the drift of *all* arms simultaneously. This provides a "global" view of the environment's evolution, allowing it to switch to a newly-optimal arm faster than the baseline. 
+
+![Non-Stationary Comparison](results/non_stationary_comparison.png)
+
+---
+
+## 6. Engineering & Reliability
 - **Test Suite**: 37 unit and integration tests are passing (100% coverage of core logic).
 - **Environment Compliance**: All environments follow the Gymnasium API.
 - **Git Repository**: Initial baseline and results pushed to GitHub, including the full `results/` directory for reproducibility.

@@ -52,6 +52,8 @@ class EnvConfig:
     num_arms: int = 10
     feedback_mode: str = "partial"  # "partial" or "full"
     reward_drift_rate: float = 0.0  # 0.0 = stationary
+    reward_std: float = 1.0
+    reward_shift_interval: int = 0
     # Grid-world specific
     grid_size: int = 5
     num_goals: int = 3
