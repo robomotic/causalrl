@@ -1,0 +1,17 @@
+agent:
+  beta: 0.1
+  epsilon: 0.1
+  gamma: 0.01
+  ofc:
+    alpha: 0.0
+    mode: fixed
+  type: counterfactual
+  world_model:
+    type: tabular
+env:
+  feedback_mode: full
+  num_arms: 10
+  type: bandit
+name: alpha_0.0_gamma_0.01
+num_episodes: 2000
+seed: 42

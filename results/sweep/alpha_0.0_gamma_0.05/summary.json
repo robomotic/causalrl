@@ -1,0 +1,8 @@
+{
+  "agent_name": "counterfactual_alpha_0.0_gamma_0.05",
+  "total_episodes": 2000,
+  "mean_reward": 0.2363297036948091,
+  "final_reward_mean": 0.2768170467259567,
+  "regret_sensitivity": 0.7845,
+  "mean_alpha": 0.0
+}
