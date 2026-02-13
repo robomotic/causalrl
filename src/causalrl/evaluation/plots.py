@@ -57,7 +57,7 @@ def plot_learning_curves(
     set_style()
     fig, ax = plt.subplots()
 
-    colors = plt.cm.Set2(np.linspace(0, 1, len(results)))
+    colors = plt.get_cmap("tab20")(np.linspace(0, 1, len(results)))
 
     for (name, metrics), color in zip(results.items(), colors):
         rewards = metrics.rewards
@@ -73,7 +73,8 @@ def plot_learning_curves(
     ax.set_xlabel("Episode")
     ax.set_ylabel("Reward (smoothed)")
     ax.set_title(title)
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    fig.tight_layout()
 
     if save_path:
         fig.savefig(save_path, bbox_inches="tight")
@@ -105,7 +106,7 @@ def plot_adaptation(
 
     start = max(0, shift_episode - context_episodes)
     end = shift_episode + context_episodes
-    colors = plt.cm.Set2(np.linspace(0, 1, len(results)))
+    colors = plt.get_cmap("tab20")(np.linspace(0, 1, len(results)))
 
     for (name, metrics), color in zip(results.items(), colors):
         rewards = metrics.rewards[start:end]
@@ -121,7 +122,8 @@ def plot_adaptation(
     ax.set_xlabel("Episode")
     ax.set_ylabel("Reward (smoothed)")
     ax.set_title(title)
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    fig.tight_layout()
 
     if save_path:
         fig.savefig(save_path, bbox_inches="tight")
