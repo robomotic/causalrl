@@ -1,0 +1,8 @@
+{
+  "agent_name": "counterfactual_stationary_comparison",
+  "total_episodes": 2000,
+  "mean_reward": 0.7624961290656392,
+  "final_reward_mean": 0.583129176015364,
+  "regret_sensitivity": 0.4545,
+  "mean_alpha": 0.5
+}

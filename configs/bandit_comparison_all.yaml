@@ -1,0 +1,25 @@
+# Comparison of Counterfactual RL vs Standard RL vs Epsilon-Greedy Baseline
+# Stationary 10-armed bandit, 2000 episodes.
+
+name: "stationary_comparison"
+seed: 42
+num_episodes: 2000
+log_dir: "results"
+
+env:
+  type: "bandit"
+  num_arms: 10
+  feedback_mode: "full" # Only CF agent uses full feedback for unchosen options
+  reward_drift_rate: 0.0
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.0
+  world_model:
+    type: "tabular"
+  ofc:
+    mode: "fixed"
+    alpha: 0.5

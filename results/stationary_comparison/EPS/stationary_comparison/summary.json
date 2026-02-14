@@ -1,0 +1,8 @@
+{
+  "agent_name": "epsilon_greedy_stationary_comparison",
+  "total_episodes": 2000,
+  "mean_reward": 0.6836225486578675,
+  "final_reward_mean": 0.7271495279551743,
+  "regret_sensitivity": 0.5,
+  "mean_alpha": 0.0
+}

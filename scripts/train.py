@@ -25,6 +25,7 @@ from causalrl.agents.ablations import (
     create_fixed_alpha_agent,
     create_adaptive_alpha_agent,
 )
+from causalrl.agents.bandit_baselines import EpsilonGreedyBandit
 from causalrl.core.ofc import OFCComparator
 from causalrl.envs.bandit import CounterfactualBanditEnv
 from causalrl.envs.grid_world import RegretGridWorldEnv
@@ -65,7 +66,14 @@ def create_agent(config: ExperimentConfig, env):
         num_states = config.env.grid_size ** 2
         num_actions = 4
 
-    if config.agent.type == "standard":
+
+    if config.agent.type == "epsilon_greedy":
+        return EpsilonGreedyBandit(
+            num_arms=num_actions,
+            epsilon=config.agent.epsilon,
+            seed=config.seed,
+        )
+    elif config.agent.type == "standard":
         return StandardRLAgent(
             num_states=num_states,
             num_actions=num_actions,
@@ -203,7 +211,7 @@ def main():
     parser.add_argument("--config", type=str, help="Path to YAML config file")
     parser.add_argument("--env", type=str, default="bandit", choices=["bandit", "grid_world"])
     parser.add_argument("--agent", type=str, default="counterfactual",
-                        choices=["standard", "counterfactual"])
+                        choices=["standard", "counterfactual", "epsilon_greedy"])
     parser.add_argument("--episodes", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", type=str, default="results")
