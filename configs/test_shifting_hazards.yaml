@@ -1,0 +1,32 @@
+# Simple Phase 2 Test: Shifting Hazards Grid
+# Single agent configuration for quick testing
+
+name: "shifting_hazards_test"
+seed: 42
+num_episodes: 200  # Reduced for quick test
+eval_interval: 50
+log_dir: "results/phase2/test"
+
+env:
+  type: "shifting_hazards"
+  grid_size: 7
+  num_traps: 3
+  trap_penalty: -5.0
+  shift_interval: 50
+  goal_reward: 10.0
+  max_steps: 100
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.99
+  world_model:
+    type: "tabular"
+  ofc:
+    mode: "adaptive"
+    alpha: 0.8
+    alpha_min: 0.0
+    alpha_max: 1.0
+    uncertainty_sensitivity: 1.0

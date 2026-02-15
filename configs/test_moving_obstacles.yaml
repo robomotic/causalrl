@@ -1,0 +1,31 @@
+# Simple Phase 2 Test: Moving Obstacles Grid
+
+name: "moving_obstacles_test"
+seed: 42
+num_episodes: 200
+eval_interval: 50
+log_dir: "results/phase2/test"
+
+env:
+  type: "moving_obstacles"
+  grid_size: 9
+  num_obstacles: 2
+  patrol_type: "vertical"
+  collision_penalty: -5.0
+  goal_reward: 10.0
+  max_steps: 150
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.99
+  world_model:
+    type: "tabular"
+  ofc:
+    mode: "adaptive"
+    alpha: 0.8
+    alpha_min: 0.0
+    alpha_max: 1.0
+    uncertainty_sensitivity: 1.0

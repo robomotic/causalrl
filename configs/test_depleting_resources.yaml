@@ -1,0 +1,31 @@
+# Simple Phase 2 Test: Depleting Resources Grid
+
+name: "depleting_resources_test"
+seed: 42
+num_episodes: 200
+eval_interval: 50
+log_dir: "results/phase2/test"
+
+env:
+  type: "depleting_resources"
+  grid_size: 7
+  num_goals: 4
+  drift_std: 0.05
+  min_value: 1.0
+  max_value: 10.0
+  max_steps: 100
+
+agent:
+  type: "counterfactual"
+  beta: 0.1
+  gamma: 0.05
+  epsilon: 0.1
+  discount: 0.99
+  world_model:
+    type: "tabular"
+  ofc:
+    mode: "adaptive"
+    alpha: 0.8
+    alpha_min: 0.0
+    alpha_max: 1.0
+    uncertainty_sensitivity: 1.0

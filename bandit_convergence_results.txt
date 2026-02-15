@@ -1,0 +1,11 @@
+CF Q-Learning Bandit Convergence Results
+================================================================================
+
+True rewards: [4.0, 10.0, 7.0]
+Steps: 20000, Seeds: 10
+
+
+Standard (Sample Avg):
+  Q(a_0): 4.0000 ± 0.0000  [True: 4.000, Error: 0.0000]
+  Q(a_1): 10.0000 ± 0.0000  [True: 10.000, Error: 0.0000]
+  Q(a_2): 7.0000 ± 0.0000  [True: 7.000, Error: 0.0000]

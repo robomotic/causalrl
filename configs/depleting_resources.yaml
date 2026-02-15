@@ -1,0 +1,117 @@
+# Phase 2: Depleting Resources Grid
+# Tests whether counterfactual agents can track the global reward landscape
+# by observing post-episode counterfactual rewards for unchosen goals.
+# Similar to non-stationary bandits but in navigation context.
+
+name: "depleting_resources"
+seed: 42
+num_episodes: 1000
+eval_interval: 50
+test_episodes: 100
+num_seeds: 5
+log_dir: "results/phase2/depleting_resources"
+
+env:
+  type: "depleting_resources"
+  grid_size: 7
+  num_goals: 4
+  drift_std: 0.05            # Standard deviation of reward drift per episode
+  initial_values: [8.0, 5.0, 5.0, 3.0]  # Starting reward values
+  min_value: 1.0
+  max_value: 10.0
+  max_steps: 100
+
+# Agent variants to compare
+agents:
+  # Counterfactual agent
+  - name: "Counterfactual"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.05
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Standard Q-learning
+  - name: "Standard"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+  
+  # High exploration
+  - name: "HighExploration"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.3
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+  
+  # Oracle world model
+  - name: "OracleCounterfactual"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.05
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "oracle"
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Ablation: Composite error only
+  - name: "CompositeOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 1.0
+  
+  # Ablation: Unchosen updates only
+  - name: "UnchosenOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.1
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+
+# Metrics to track
+metrics:
+  - "cumulative_reward"
+  - "episode_reward"
+  - "regret"                  # Difference from best goal
+  - "goal_tracking_error"     # Error in Q-value estimates for unvisited goals
+  - "adaptation_speed"        # Response to reward drift
+  - "steps_to_goal"

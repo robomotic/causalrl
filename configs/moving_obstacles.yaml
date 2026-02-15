@@ -1,0 +1,116 @@
+# Phase 2: Moving Obstacles Grid
+# Tests whether counterfactual agents can learn relative safety of
+# alternative paths by simulating "what if I took route B/C?" after
+# single observations of obstacle positions.
+
+name: "moving_obstacles"
+seed: 42
+num_episodes: 1000
+eval_interval: 50
+test_episodes: 100
+num_seeds: 5
+log_dir: "results/phase2/moving_obstacles"
+
+env:
+  type: "moving_obstacles"
+  grid_size: 9
+  num_obstacles: 2
+  patrol_type: "vertical"     # Options: "vertical", "horizontal", "circular"
+  collision_penalty: -5.0
+  goal_reward: 10.0
+  max_steps: 150
+
+# Agent variants to compare
+agents:
+  # Counterfactual agent
+  - name: "Counterfactual"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.05
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Standard Q-learning
+  - name: "Standard"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+  
+  # High exploration
+  - name: "HighExploration"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.3
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+  
+  # Oracle world model
+  - name: "OracleCounterfactual"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.05
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "oracle"
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Ablation: Composite error only
+  - name: "CompositeOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 1.0
+  
+  # Ablation: Unchosen updates only
+  - name: "UnchosenOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.1
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+
+# Metrics to track
+metrics:
+  - "cumulative_reward"
+  - "episode_reward"
+  - "collision_rate"          # Proportion of steps with collisions
+  - "path_efficiency"         # Ratio of optimal path length to actual
+  - "steps_to_goal"
+  - "safe_path_learning"      # Episodes to discover collision-free route

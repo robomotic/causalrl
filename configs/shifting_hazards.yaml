@@ -1,0 +1,116 @@
+# Phase 2: Shifting Hazards Grid
+# Tests whether counterfactual agents can:
+# 1. Learn safe paths after trap encounters without exhaustive exploration
+# 2. Adapt faster when trap locations shift by maintaining beliefs about alternative routes
+
+name: "shifting_hazards"
+seed: 42
+num_episodes: 1000
+eval_interval: 50
+test_episodes: 100
+num_seeds: 5
+log_dir: "results/phase2/shifting_hazards"
+
+env:
+  type: "shifting_hazards"
+  grid_size: 7
+  num_traps: 3
+  trap_penalty: -5.0
+  shift_interval: 50  # Traps relocate every 50 episodes
+  goal_reward: 10.0
+  max_steps: 100
+
+# Agent variants to compare
+agents:
+  # Counterfactual agent with composite error
+  - name: "Counterfactual"
+    type: "counterfactual"
+    beta: 0.1          # Learning rate for chosen actions
+    gamma: 0.05        # Learning rate for unchosen actions
+    epsilon: 0.1       # Exploration rate
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8       # Strong counterfactual signal
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Standard Q-learning (no counterfactuals)
+  - name: "Standard"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0         # No unchosen updates
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0       # No composite error
+  
+  # High exploration baseline (fair sample budget)
+  - name: "HighExploration"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0
+    epsilon: 0.3       # 3x standard exploration
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0
+  
+  # Oracle world model (perfect predictions)
+  - name: "OracleCounterfactual"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.05
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "oracle"    # Perfect environment model
+    ofc:
+      mode: "adaptive"
+      alpha: 0.8
+      alpha_min: 0.0
+      alpha_max: 1.0
+      uncertainty_sensitivity: 1.0
+  
+  # Ablation: Only composite error (α pathway)
+  - name: "CompositeOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.0         # Disable unchosen updates
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 1.0       # Full composite error
+  
+  # Ablation: Only unchosen updates (γ_cf pathway)
+  - name: "UnchosenOnly"
+    type: "counterfactual"
+    beta: 0.1
+    gamma: 0.1         # Strong unchosen learning
+    epsilon: 0.1
+    discount: 0.99
+    world_model:
+      type: "tabular"
+    ofc:
+      mode: "fixed"
+      alpha: 0.0       # No composite error
+
+# Metrics to track
+metrics:
+  - "cumulative_reward"
+  - "episode_reward"
+  - "adaptation_lag"          # Episodes to recover after shift
+  - "trap_hit_rate"           # Proportion of episodes hitting traps
+  - "regret_per_phase"        # Cumulative regret between shifts
+  - "steps_to_goal"           # Episode length (efficiency)
