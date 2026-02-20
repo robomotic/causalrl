@@ -127,7 +127,7 @@ Two distinct dopaminergic pathways support this dual learning:
 | Pearl Level | Formal | Child Development | Brain Region | Current Project |
 |-------------|--------|------------------|--------------|-----------------|
 | **1. Association** | $P(Y \mid X)$ | Pavlovian conditioning (birth–8 months) | Amygdala, cerebellum | ❌ Not the focus |
-| **2. Intervention** | $P(Y \mid do(X))$ | Blicket detector experiments (18–24 months) | Dorsolateral PFC, ACC | **⚠️ Missing (this proposal)** |
+| **2. Intervention** | $P(Y \mid \text{do}(X))$ | Blicket detector experiments (18–24 months) | Dorsolateral PFC, ACC | **⚠️ Missing (this proposal)** |
 | **3. Counterfactual** | $P(Y_x \mid X=x', Y=y')$ | "What if" reasoning (4+ years) | vmPFC, OFC | ✅ Current CF Q-learning |
 
 **Problem:** The current project jumps directly to Level 3 by assuming a world model good enough for counterfactual inference. But **Level 2 is the foundation** — without learning what interventions *do*, counterfactual predictions are unreliable.
@@ -153,7 +153,9 @@ The three levels of Pearl's Causal Hierarchy map naturally onto the OAK architec
 
 #### Ladder 1: Association → **Passive GVFs** (Observational Policies)
 
-$$P(Y \mid X) \quad \longleftrightarrow \quad v_{\pi_{\text{obs}}}(s; C_Y, \gamma)$$
+$$
+P(Y \mid X) \quad \longleftrightarrow \quad v_{\pi_{\text{obs}}}(s; C_Y, \gamma)
+$$
 
 - **Pearl**: $P(Y \mid X)$ — seeing correlation
 - **OAK**: A GVF with cumulant $C = Y$ under the **observation policy** $\pi_{\text{obs}}$ (passive observation)
@@ -162,19 +164,23 @@ $$P(Y \mid X) \quad \longleftrightarrow \quad v_{\pi_{\text{obs}}}(s; C_Y, \gamm
 
 #### Ladder 2: Intervention → **Interventional GVFs** (Option Policies)
 
-$$P(Y \mid do(X)) \quad \longleftrightarrow \quad v_{\omega_{do(X)}}(s; C_Y, \gamma)$$
+$$
+P(Y \mid \text{do}(X)) \quad \longleftrightarrow \quad v_{\omega_{\text{do}(X)}}(s; C_Y, \gamma)
+$$
 
 - **Pearl**: $P(Y \mid do(X=x))$ — causal effect of forcing $X$
 - **OAK**: A GVF with cumulant $C = Y$ under the **intervention option** $\omega_{do(X=x)}$
 - **The Option Policy**: "Take actions until $X = x$, regardless of confounders" — literally implements graph surgery
-- **Causal Discovery**: Compare $v_{\omega_{do(X)}}(s; C_Y)$ vs. $v_{\pi_{\text{obs}}}(s; C_Y)$ — if they differ, there's confounding
+- **Causal Discovery**: Compare $v_{\omega_{\text{do}(X)}}(s; C_Y) \text{ vs. } v_{\pi_{\text{obs}}}(s; C_Y)$ — if they differ, there's confounding
 - **Learning**: On-policy TD under the intervention option
 
 **Key insight:** The $do$-operator IS an option. Each potential causal edge $V_i \to V_j$ becomes a GVF that predicts "if I intervene on $V_i$, what happens to $V_j$?" The causal graph emerges from which edge-GVFs have non-zero, reliable predictions.
 
 #### Ladder 3: Counterfactual → **Off-Policy GVF Evaluation**
 
-$$P(Y_x \mid X = x', Y = y') \quad \longleftrightarrow \quad v_{\omega_{do(X=x)}}(s; C_Y) \text{ via off-policy correction}$$
+$$
+P(Y_x \mid X = x', Y = y') \quad \longleftrightarrow \quad v_{\omega_{\text{do}(X=x)}}(s; C_Y) \text{ via off-policy correction}
+$$
 
 - **Pearl**: "Given $(X=x', Y=y')$, what would $Y$ be under $do(X=x)$?"
 - **OAK**: Evaluate intervention option $\omega_{do(X=x)}$ from agent-state $\hat{s}$ consistent with observations $(x', y')$ using off-policy GVF methods
@@ -204,7 +210,9 @@ where $\lambda(t)$ decays as GVF predictions become reliable, analogous to how d
 
 We extend the standard MDP to include explicit causal structure and dual rewards:
 
-$$\mathcal{M}_{\text{causal}} = (\mathcal{S}, \mathcal{A}, \mathcal{G}, \text{SEM}, R_{\text{ext}}, R_{\text{int}}, \gamma)$$
+$$
+\mathcal{M}_{\text{causal}} = (\mathcal{S}, \mathcal{A}, \mathcal{G}, \text{SEM}, R_{\text{ext}}, R_{\text{int}}, \gamma)
+$$
 
 **Components:**
 
@@ -212,8 +220,10 @@ $$\mathcal{M}_{\text{causal}} = (\mathcal{S}, \mathcal{A}, \mathcal{G}, \text{SE
 - $\mathcal{A}$: Action space — now interpreted as **interventions** $do(V_j = v)$
 - $\mathcal{G} = (V, E)$: **Causal DAG** over state variables $V = \{V_1, \ldots, V_d\}$ (initially unknown)
 - $\text{SEM}$: **Structural Equation Model** defining mechanisms:
-  $$V_i = f_i(\text{Pa}(V_i), U_i)$$
-  where $\text{Pa}(V_i)$ are parents in $\mathcal{G}$ and $U_i$ is exogenous noise
+$$
+V_i = f_i(\text{Pa}(V_i), U_i)
+$$
+where $\text{Pa}(V_i)$ are parents in $\mathcal{G}$ and $U_i$ is exogenous noise
 - $R_{\text{ext}}: \mathcal{S} \times \mathcal{A} \to \mathbb{R}$: Extrinsic task reward (can be zero during exploration phase)
 - $R_{\text{int}}: \mathcal{S} \times \mathcal{A} \times \mathcal{S}' \to \mathbb{R}$: **Intrinsic reward for causal discovery** (the key contribution)
 - $\gamma$: Discount factor
@@ -222,13 +232,17 @@ $$\mathcal{M}_{\text{causal}} = (\mathcal{S}, \mathcal{A}, \mathcal{G}, \text{SE
 
 The agent maintains a **posterior distribution** over possible causal structures:
 
-$$P(\mathcal{G} \mid \mathcal{D}_t)$$
+$$
+P(\mathcal{G} \mid \mathcal{D}_t)
+$$
 
 where $\mathcal{D}_t = \{(s_i, a_i, s'_i)\}_{i=1}^t$ is the history of state transitions.
 
 **Goal during exploration:** Maximize information gain about $\mathcal{G}$:
 
-$$\mathcal{G}^* = \arg\max_{\mathcal{G}} P(\mathcal{G} \mid \mathcal{D})$$
+$$
+\mathcal{G}^* = \arg\max_{\mathcal{G}} P(\mathcal{G} \mid \mathcal{D})
+$$
 
 **Goal during exploitation:** Use learned $\mathcal{G}$ for counterfactual Q-learning with principled predictions.
 
@@ -241,7 +255,9 @@ We reformulate intrinsic motivation as **GVF prediction discrepancies** rather t
 ### 7.1 Strategy A: GVF Uncertainty Reduction (Information-Theoretic)
 
 **Definition (OAK formulation):**
-$$R_{\text{int}}^{(A)}(t) = \sum_{(V_i, V_j)} H[v_{\omega_{do(V_i)}}(\hat{s}_t; C_{V_j})] - H[v_{\omega_{do(V_i)}}(\hat{s}_{t+1}; C_{V_j})]$$
+$$
+R_{\text{int}}^{(A)}(t) = \sum_{(V_i, V_j)} H[v_{\omega_{\text{do}(V_i)}}(\hat{s}_t; C_{V_j})] - H[v_{\omega_{\text{do}(V_i)}}(\hat{s}_{t+1}; C_{V_j})]
+$$
 
 The agent receives intrinsic reward proportional to **reduction in GVF prediction uncertainty** across the network.
 
@@ -265,11 +281,15 @@ The agent receives intrinsic reward proportional to **reduction in GVF predictio
 ### 7.2 Strategy B: GVF Prediction Error (Surprise-Based) — **CANONICAL ALBERTA PLAN APPROACH**
 
 **Definition (OAK formulation):**
-$$R_{\text{int}}^{(B)}(t) = \sum_{j \in \Psi} |\delta_j(t)|$$
+$$
+R_{\text{int}}^{(B)}(t) = \sum_{j \in \Psi} |\delta_j(t)|
+$$
 
 where $\delta_j(t)$ is the **TD error for GVF** $\psi_j$:
 
-$$\delta_j(t) = C_{j,t+1} + \gamma_j v_{\pi_j}(\hat{s}_{t+1}) - v_{\pi_j}(\hat{s}_t)$$
+$$
+\delta_j(t) = C_{j,t+1} + \gamma_j v_{\pi_j}(\hat{s}_{t+1}) - v_{\pi_j}(\hat{s}_t)
+$$
 
 The agent is intrinsically rewarded when its **interventional GVFs make prediction errors**.
 
@@ -296,11 +316,15 @@ The agent is intrinsically rewarded when its **interventional GVFs make predicti
 **Definition:**
 For each candidate intervention $do(X=x)$, compute expected information gain about a target variable $Y$:
 
-$$\text{IG}(X \to Y) = H[Y \mid \mathcal{D}_t] - \mathbb{E}_{do(X=x)}[H[Y \mid \mathcal{D}_t, do(X=x), Y_{\text{obs}}]]$$
+$$
+\text{IG}(X \to Y) = H[Y \mid \mathcal{D}_t] - \mathbb{E}_{\text{do}(X=x)}[H[Y \mid \mathcal{D}_t, \text{do}(X=x), Y_{\text{obs}}]]
+$$
 
 Choose the intervention that maximally reduces uncertainty about $Y$:
 
-$$R_{\text{int}}^{(C)}(t) = \max_{(X,x)} \text{IG}(X \to Y)$$
+$$
+R_{\text{int}}^{(C)}(t) = \max_{(X,x)} \text{IG}(X \to Y)
+$$
 
 **Interpretation:**
 - Agent selectively intervenes on variables that reveal the most about causal structure
@@ -323,7 +347,9 @@ $$R_{\text{int}}^{(C)}(t) = \max_{(X,x)} \text{IG}(X \to Y)$$
 ### 7.4 Strategy D: GVF Discrepancy (Causal Influence Detection) — **RECOMMENDED STARTING POINT**
 
 **Definition (OAK formulation):**
-$$R_{\text{int}}^{(D)}(t) = \sum_{j} \Big|v_{\omega_{do(V_i)}}(\hat{s}_t; C_{V_j}) - v_{\pi_{\text{obs}}}(\hat{s}_t; C_{V_j})\Big|$$
+$$
+R_{\text{int}}^{(D)}(t) = \sum_{j} \Big|v_{\omega_{\text{do}(V_i)}}(\hat{s}_t; C_{V_j}) - v_{\pi_{\text{obs}}}(\hat{s}_t; C_{V_j})\Big|
+$$
 
 The agent is rewarded for discovering **where interventional GVFs differ from observational GVFs**.
 
@@ -412,11 +438,15 @@ for t in continual_experience_stream:
 
 The weighting $\lambda(t)$ shifts emphasis as the agent gains causal knowledge:
 
-$$\lambda(t) = \lambda_{\max} \cdot \exp\left(-\eta \cdot \frac{1}{|\Psi|} \sum_{j \in \Psi} \text{confidence}(v_j)\right)$$
+$$
+\lambda(t) = \lambda_{\max} \cdot \exp\left(-\eta \cdot \frac{1}{|\Psi|} \sum_{j \in \Psi} \text{confidence}(v_j)\right)
+$$
 
 where confidence can be computed as:
 
-$$\text{confidence}(v_j) = 1 - \frac{|\delta_j|_{\text{MA}}}{|\delta_j|_{\text{init}}}$$
+$$
+\text{confidence}(v_j) = 1 - \frac{|\delta_j|_{\text{MA}}}{|\delta_j|_{\text{init}}}
+$$
 
 (ratio of current TD error moving average to initial error)
 
@@ -438,7 +468,9 @@ The counterfactual query mechanism is reformulated:
 1. **Abduction**: Agent-state $\hat{s}_t = \phi(\text{history including } X=x, Y=y)$ **already encodes** all relevant context
 2. **Action**: Switch from behavior option $\omega_{\text{behavior}}$ to intervention option $\omega_{do(X=x')}$
 3. **Prediction**: Evaluate interventional GVF **off-policy** using importance sampling:
-   $$v_{\omega_{do(X=x')}}(\hat{s}_t; C_Y) \text{ via GTD}(\lambda) \text{ or Emphatic TD}$$
+$$
+v_{\omega_{\text{do}(X=x')}}(\hat{s}_t; C_Y) \text{ via GTD}(\lambda) \text{ or Emphatic TD}
+$$
 
 **Key advantages:**
 - No explicit inference of exogenous variables $U$ — agent-state $\hat{s}_t$ implicitly captures them
@@ -847,7 +879,7 @@ This project sits at the intersection of multiple research communities:
 |--------|-------------------|---------------------------|
 | **Robotics** | Needs thousands of trials per task | Learns reusable GVF network → 10× faster transfer |
 | **Healthcare** | Observational data confounded | Discovers true treatment effects via interventional GVFs |
-| **Autonomous Driving** | Spurious correlations (e.g., "sunny → safe") | Learns causal mechanisms via $|v_{\omega} - v_{\pi_{\text{obs}}}|$ |
+| **Autonomous Driving** | Spurious correlations (e.g., "sunny → safe") | Learns causal mechanisms via $\|v_{\omega} - v_{\pi_{\text{obs}}}\|$ |
 | **Game AI** | AlphaGo needs millions of games | Could learn game mechanics via interventional GVFs |
 
 **Killer app:** A robot that, like a child, systematically experiments via intervention options for 1 hour (high $\lambda$), then **adapts instantly** when task changes ("make coffee" → "heat soup"), because it learned the **causal structure as GVF predictions** (heating, mixing, pouring), not just task-specific policies. As GVF confidence grows, $\lambda \to 0$ and the robot focuses on task performance.

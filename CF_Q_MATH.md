@@ -35,15 +35,21 @@ We consider a finite MDP $\mathcal{M} = (\mathcal{S}, \mathcal{A}, P, R, \gamma)
 
 The **optimal action-value function** (Q-function) satisfies the Bellman optimality equation:
 
-$$Q^*(s,a) = R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} Q^*(s',a')$$
+$$
+Q^*(s,a) = R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s'|s,a) \max_{a' \in \mathcal{A}} Q^*(s',a')
+$$
 
 Or more compactly using the Bellman optimality operator $\mathcal{T}^*: \mathbb{R}^{|\mathcal{S}||\mathcal{A}|} \to \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}$:
 
-$$(\mathcal{T}^* Q)(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q(s',a')$$
+$$
+(\mathcal{T}^* Q)(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q(s',a')
+$$
 
 **Key property:** $\mathcal{T}^*$ is a $\gamma$-contraction in the supremum norm:
 
-$$\|\mathcal{T}^* Q_1 - \mathcal{T}^* Q_2\|_\infty \le \gamma \|Q_1 - Q_2\|_\infty$$
+$$
+\|\mathcal{T}^* Q_1 - \mathcal{T}^* Q_2\|_\infty \le \gamma \|Q_1 - Q_2\|_\infty
+$$
 
 This ensures $Q^*$ is the unique fixed point: $Q^* = \mathcal{T}^* Q^*$.
 
@@ -51,7 +57,9 @@ This ensures $Q^*$ is the unique fixed point: $Q^* = \mathcal{T}^* Q^*$.
 
 The classical Q-learning update (Watkins & Dayan, 1992) is:
 
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t,a_t) + \alpha_t \Big[r_t + \gamma \max_{a'} Q_t(s_{t+1},a') - Q_t(s_t,a_t)\Big]$$
+$$
+Q_{t+1}(s_t,a_t) = Q_t(s_t,a_t) + \alpha_t \Big[r_t + \gamma \max_{a'} Q_t(s_{t+1},a') - Q_t(s_t,a_t)\Big]
+$$
 
 Under appropriate conditions (every $(s,a)$ visited infinitely often, Robbins-Monro step sizes), this converges almost surely to $Q^*$.
 
@@ -66,29 +74,39 @@ The counterfactual Q-learning algorithm extends standard Q-learning by incorpora
 At each timestep $t$, after observing transition $(s_t, a_t, r_t, s_{t+1})$, the agent computes three error signals:
 
 **Actual TD Error:**
-$$\delta_{\text{actual},t} = r_t + \gamma \max_{a'} Q_t(s_{t+1},a') - Q_t(s_t,a_t)$$
+$$
+\delta_{\text{actual},t} = r_t + \gamma \max_{a'} Q_t(s_{t+1},a') - Q_t(s_t,a_t)
+$$
 
 This is the standard temporal-difference error measuring the discrepancy between the observed return and the current value estimate.
 
 **Counterfactual Error (Regret/Relief):**
-$$\delta_{\text{cf},t} = \max_{a \neq a_t} Q_t(s_t,a) - r_t$$
+$$
+\delta_{\text{cf},t} = \max_{a \neq a_t} Q_t(s_t,a) - r_t
+$$
 
 This measures the opportunity cost:
 - If $\delta_{\text{cf},t} > 0$: **regret** (the best unchosen alternative had higher value than the reward obtained)
 - If $\delta_{\text{cf},t} < 0$: **relief** (the obtained reward was better than all alternatives)
 
 **Composite Error:**
-$$\delta_{\text{composite},t} = \delta_{\text{actual},t} + \alpha_t \cdot \delta_{\text{cf},t}$$
+$$
+\delta_{\text{composite},t} = \delta_{\text{actual},t} + \alpha_t \cdot \delta_{\text{cf},t}
+$$
 
 where $\alpha_t \in [0,1]$ is a weight determining the influence of counterfactual information.
 
 ### 2.2 Dual Update Rules
 
 **Update for chosen action** $a_t$:
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t,a_t) + \beta \cdot \delta_{\text{composite},t}$$
+$$
+Q_{t+1}(s_t,a_t) = Q_t(s_t,a_t) + \beta \cdot \delta_{\text{composite},t}
+$$
 
 **Update for each unchosen action** $a \neq a_t$:
-$$Q_{t+1}(s_t,a) = Q_t(s_t,a) + \gamma_{\text{cf}} \cdot c_a \cdot \big(\hat{r}(s_t,a) - Q_t(s_t,a)\big)$$
+$$
+Q_{t+1}(s_t,a) = Q_t(s_t,a) + \gamma_{\text{cf}} \cdot c_a \cdot \big(\hat{r}(s_t,a) - Q_t(s_t,a)\big)
+$$
 
 where:
 - $\beta$ is the learning rate for chosen actions
@@ -103,7 +121,9 @@ The algorithm maintains a world model that learns:
 - $\hat{P}(s'|s,a) \approx P(s'|s,a)$: transition dynamics
 
 For tabular models with visit counts $N(s,a)$, the confidence is typically:
-$$c_a = 1 - e^{-\lambda N(s_t,a)}$$
+$$
+c_a = 1 - e^{-\lambda N(s_t,a)}
+$$
 
 where $\lambda > 0$ controls the rate at which confidence grows (commonly $\lambda = 0.1$).
 
@@ -115,7 +135,9 @@ The weight $\alpha_t$ can be:
 $$\alpha_t = \alpha_0 \quad \text{(constant)}$$
 
 **Adaptive mode:**
-$$\alpha_t(s,a) = \alpha_{\min} + \Big[\bar{c}_{\text{cf}} \cdot (1 - e^{-\lambda N(s,a)})\Big]^{1/\sigma} (\alpha_{\max} - \alpha_{\min})$$
+$$
+\alpha_t(s,a) = \alpha_{\min} + \Big[\bar{c}_{\text{cf}} \cdot (1 - e^{-\lambda N(s,a)})\Big]^{1/\sigma} (\alpha_{\max} - \alpha_{\min})
+$$
 
 where $\bar{c}_{\text{cf}}$ is the mean world model confidence and $\sigma$ is an uncertainty sensitivity parameter.
 
@@ -132,24 +154,32 @@ $$\mathbb{E}[\delta_{\text{composite}}] = 0$$
 Expanding:
 $$\mathbb{E}[r_t + \gamma \max_{a'} \bar{Q}(s',a') - \bar{Q}(s,a)] + \alpha \mathbb{E}\Big[\max_{a \neq a_t} \bar{Q}(s,a) - r_t\Big] = 0$$
 
-$$R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} \bar{Q}(s',a') - \bar{Q}(s,a) + \alpha\Big(\max_{a' \neq a} \bar{Q}(s,a') - R(s,a)\Big) = 0$$
+$$
+R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} \bar{Q}(s',a') - \bar{Q}(s,a) + \alpha\Big(\max_{a' \neq a} \bar{Q}(s,a') - R(s,a)\Big) = 0
+$$
 
 Solving for $\bar{Q}(s,a)$:
 
 $$\boxed{\bar{Q}(s,a) = (1-\alpha)R(s,a) + \alpha \max_{a' \neq a} \bar{Q}(s,a') + \gamma \sum_{s'} P(s'|s,a) \max_{a'} \bar{Q}(s',a')}$$
 
 Compare with the Bellman optimality equation:
-$$Q^*(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s',a')$$
+$$
+Q^*(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s',a')
+$$
 
 **Key observation:** The term $\alpha \max_{a' \neq a} \bar{Q}(s,a')$ introduces a coupling between actions that is not present in $Q^*$.
 
 ### 3.2 Bias Quantification
 
 The fixed point satisfies:
-$$\bar{Q}(s,a) - Q^*(s,a) = -\alpha R(s,a) + \alpha \max_{a' \neq a} \bar{Q}(s,a')$$
+$$
+\bar{Q}(s,a) - Q^*(s,a) = -\alpha R(s,a) + \alpha \max_{a' \neq a} \bar{Q}(s,a')
+$$
 
 In the worst case (for non-bandit MDPs):
-$$\|\bar{Q} - Q^*\|_\infty \le \frac{\alpha R_{\max}}{(1-\gamma)(1-\alpha)}$$
+$$
+\|\bar{Q} - Q^*\|_\infty \le \frac{\alpha R_{\max}}{(1-\gamma)(1-\alpha)}
+$$
 
 ### 3.3 Concrete Counterexample: Two-Armed Bandit
 
@@ -184,7 +214,9 @@ The unchosen update targets:
 $$\hat{r}(s,a) \quad \text{(immediate reward only)}$$
 
 But the true optimal value includes the future:
-$$Q^*(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s',a')$$
+$$
+Q^*(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s',a')
+$$
 
 This myopic target introduces bias:
 $$\text{Bias}_{\text{unchosen}}(s,a) = -\gamma \sum_{s'} P(s'|s,a) \max_{a'} Q^*(s',a')$$
@@ -239,7 +271,9 @@ where:
 - $M_t(s,a)$ counts times the unchosen update was applied to $(s,a)$
 
 These satisfy the Robbins-Monro conditions:
-$$\sum_{t} \beta_t(s,a) = \infty, \qquad \sum_{t} \beta_t(s,a)^2 < \infty$$
+$$
+\sum_{t} \beta_t(s,a) = \infty, \qquad \sum_{t} \beta_t(s,a)^2 < \infty
+$$
 
 ---
 
@@ -285,14 +319,18 @@ where:
 **Step 2: Contraction Property**
 
 The Bellman operator $\mathcal{T}^*$ is a $\gamma$-contraction:
-$$\|\mathcal{T}^* Q_1 - \mathcal{T}^* Q_2\|_\infty \le \gamma \|Q_1 - Q_2\|_\infty$$
+$$
+\|\mathcal{T}^* Q_1 - \mathcal{T}^* Q_2\|_\infty \le \gamma \|Q_1 - Q_2\|_\infty
+$$
 
 Thus, the mean field $h(Q) = \mathcal{T}^* Q - Q$ has a unique globally asymptotically stable equilibrium at $Q^*$.
 
 **Step 3: Noise Conditions**
 
 The martingale-difference terms satisfy:
-$$\mathbb{E}[\xi_t | \mathcal{F}_t] = 0, \qquad \mathbb{E}[\|\xi_t\|^2 | \mathcal{F}_t] \le C(1 + \|Q_t\|^2)$$
+$$
+\mathbb{E}[\xi_t | \mathcal{F}_t] = 0, \qquad \mathbb{E}[\|\xi_t\|^2 | \mathcal{F}_t] \le C(1 + \|Q_t\|^2)
+$$
 
 where $C$ depends on $R_{\max}$ and the MDP structure. This holds because rewards are bounded and Q-values remain bounded under the updates.
 
@@ -306,7 +344,9 @@ This means for large $t$, the model-based updates ($\hat{h}$) are arbitrarily cl
 **Step 5: Perturbation Summability**
 
 The bias perturbation satisfies:
-$$\|\epsilon_t\|_\infty \le \alpha_t \cdot \max_{s,a} |\delta_{\text{cf},t}(s,a)| \le \alpha_t \cdot (R_{\max} + \|Q_t\|_\infty)$$
+$$
+\|\epsilon_t\|_\infty \le \alpha_t \cdot \max_{s,a} |\delta_{\text{cf},t}(s,a)| \le \alpha_t \cdot (R_{\max} + \|Q_t\|_\infty)
+$$
 
 By (A4):
 $$\sum_{t} \beta_t \|\epsilon_t\|_\infty \le \sum_{t} \beta_t \alpha_t (R_{\max} + \sup_{u \le t} \|Q_u\|_\infty) < \infty \quad \text{a.s.}$$
@@ -516,7 +556,9 @@ Due to the complexity of grid world environments (sparse rewards, long horizons)
 - **Significant bias:** $\hat{Q}(a_2) = 7.686$ instead of true $Q^*(a_2) = 10.0$
 - Error of $2.31$ (23.1% relative error on optimal action!)
 - **Theoretical prediction:** For the optimal arm with $\alpha = 0.8$:
-  $$\bar{Q}(a_2) = (1-0.8) \cdot 10.0 + 0.8 \cdot \max(4.0, 7.0) = 2.0 + 5.6 = 7.6$$
+$$
+\bar{Q}(a_2) = (1-0.8) \cdot 10.0 + 0.8 \cdot \max(4.0, 7.0) = 2.0 + 5.6 = 7.6
+$$
 - **Experimental:** $7.686 \pm 0.064$ — matches theory within 1.1%!
 - Values are **compressed** toward each other by compression ratio $(1-\alpha)/(1+\alpha) = 0.11$
 
